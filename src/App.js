@@ -1,48 +1,59 @@
+import { useState , useEffect } from 'react';
+import Dado from './Dado.js'
+
 const RESULTADOS = ["A", "7", "8", "J", "Q", "K"];
-const dados = [
+/*const dados = [
   ['A', false],
   ['8', false],
   [null, false],
   [null, false],
   [null, false]
-];
-const dados2 = [
-  {dado:'A', estado:false},
-  {dado:'K', estado:true},
-  {dado:null, estado:false},
-  {dado:null, estado:false},
-  {dado:null, estado:false},
-];
-
+];*/
 function lanzarDado() {
   const num = Math.floor(Math.random() * 6);
   return RESULTADOS[num];
 };
 
-function lanzarDados(){
-  console.log("ENTRA:");
- /* for (let i = 0; i < 5; i++) {
-    const [d, bloqueado] = dados[i];
-    dados[i][0]=lanzarDado();
-    console.log(dados[i][0]);
-  }*/
-  for (let i = 0; i < dados2.length; i++) {
-    if (!dados2[i].estado)
-    dados2[i].dado = lanzarDado();
-  }
+function lanzarDados({ dados, setDados }) {
+  const nuevosDados = dados.map((dado,i) => {
+    if (!dado.estado) {
+      console.log(`Lanzando dado ${i}`);
+      return {
+        ...dado,
+        dado: lanzarDado(),
+        estado: true,
+      };
+    } else {
+      return dado;
+    }
+  });
+
+  setDados(nuevosDados);
 }
 
 export default function Tablero() {
 
-  lanzarDados();
+  const datos = [
+    {dado:null, estado:false},
+    {dado:null, estado:false},
+    {dado:null, estado:false},
+    {dado:null, estado:false},
+    {dado:null, estado:false},
+  ];
+  
+  const [dados, setDados] = useState(datos);
+
+  useEffect(() => {
+    // Actualizar el estado de los dados después de llamar a lanzarDados
+    setDados(dados);
+  }, [dados]);
 
   return (
     <>
-      <h1>{dados2[0].dado}</h1>
-      <h1>{dados2[1].dado}</h1>
-      <h1>{dados2[2].dado}</h1>
-      <h1>{dados2[3].dado}</h1>
-      <h1>{dados2[4].dado}</h1>
+      {dados.map((item, i) => (
+       Dado(item,i)
+    ))}
+    <button className="Lanzar" onClick={()=>lanzarDados({dados, setDados})}>Lanzar dados</button>
     </>
   );
 }
