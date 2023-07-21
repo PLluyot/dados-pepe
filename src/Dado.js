@@ -1,9 +1,11 @@
 import React from 'react'
 
-const Dado = (item,i) => {
+const Dado = ({value, onDadoClick}) => {
+  let claseDado = "dado";
+  if (value.estado) claseDado="dado blocked";
   return (
-    <button key={i} className="dado">
-        {item.dado}
+    <button className={claseDado} onClick={onDadoClick}>
+        {value.dado}
     </button>
   )
 }
