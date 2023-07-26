@@ -2,8 +2,17 @@ import Dado from './Dado.js'
 import Tabla from './Tabla.js'
 import { useState } from 'react';
 
+import K from './Assets/K.png';
+import Q from './Assets/Q.png';
+import A from './Assets/A.png';
+import N from './Assets/N.png';
+import R from './Assets/R.png';
+import J from './Assets/J.png';
+
+
 const RESULTADOS = ["A", "R", "N", "J", "Q", "K"];
 const ICONOS = ["./Assets/A.svg", "./Assets/R.svg", "./Assets/N.svg", "./Assets/J.svg", "./Assets/Q.svg", "./Assets/K.svg"];
+
 
 function lanzarDado() {
   const num = Math.floor(Math.random() * 6);
@@ -13,16 +22,17 @@ let numLanzamientos = 3;
 
 export default function Tablero() {
   const dadosIniciales = [
-    { dado: null, estado: false, icono: null },
-    { dado: null, estado: false, icono: null },
-    { dado: null, estado: false, icono: null },
-    { dado: null, estado: false, icono: null },
-    { dado: null, estado: false, icono: null },
+    { dado: null, estado: false},
+    { dado: null, estado: false},
+    { dado: null, estado: false},
+    { dado: null, estado: false},
+    { dado: null, estado: false},
   ];
   /* dados estado */
   const [dados, setDados] = useState(dadosIniciales);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [total, setTotal] = useState(0);
+  const [finPartida, setFinPartida] = useState(false);
   const [tablaPuntos, setTablaPuntos] = useState(
     [{
       dados: [
@@ -33,7 +43,8 @@ export default function Tablero() {
         { dado: null, estado: false },
       ],
       botonBloqueado: false,
-      descripcion: 'Número de Ases',
+      descripcion: 'As',
+      imagen: A,
       puntos: 0,
       key: 'A',
       valor: 6,
@@ -47,7 +58,8 @@ export default function Tablero() {
         { dado: null, estado: false },
       ],
       botonBloqueado: false,
-      descripcion: 'Número de Reyes',
+      descripcion: 'King',
+      imagen: K,
       puntos: 0,
       key: 'K',
       valor: 5,
@@ -61,7 +73,8 @@ export default function Tablero() {
         { dado: null, estado: false },
       ],
       botonBloqueado: false,
-      descripcion: 'Número de Damas',
+      descripcion: 'Queen',
+      imagen: Q,
       puntos: 0,
       key: 'Q',
       valor: 4,
@@ -75,7 +88,8 @@ export default function Tablero() {
         { dado: null, estado: false },
       ],
       botonBloqueado: false,
-      descripcion: 'Número de Jotas',
+      descripcion: 'Joker',
+      imagen: J,
       puntos: 0,
       key: 'J',
       valor: 3,
@@ -89,7 +103,8 @@ export default function Tablero() {
         { dado: null, estado: false },
       ],
       botonBloqueado: false,
-      descripcion: 'Número de Rojos',
+      descripcion: 'Red',
+      imagen: R,
       puntos: 0,
       key: 'R',
       valor: 2,
@@ -103,7 +118,8 @@ export default function Tablero() {
         { dado: null, estado: false },
       ],
       botonBloqueado: false,
-      descripcion: 'Número de Negros',
+      descripcion: 'Black',
+      imagen: N,
       puntos: 0,
       key: 'N',
       valor: 1,
@@ -117,13 +133,48 @@ export default function Tablero() {
         { dado: null, estado: false },
       ],
       botonBloqueado: false,
-      descripcion: 'FULL: 3 dados + 2 dados',
+      descripcion: 'Full',
+      imagen: A,
       puntos: 0,
       key: 'FULL',
       valor: 30,
     },
+    {
+      dados: [
+        { dado: null, estado: false },
+        { dado: null, estado: false },
+        { dado: null, estado: false },
+        { dado: null, estado: false },
+        { dado: null, estado: false },
+      ],
+      botonBloqueado: false,
+      descripcion: 'Poker',
+      imagen: A,
+      puntos: 0,
+      key: 'P',
+      valor: 45,
+    },
+    {
+      dados: [
+        { dado: null, estado: false },
+        { dado: null, estado: false },
+        { dado: null, estado: false },
+        { dado: null, estado: false },
+        { dado: null, estado: false },
+      ],
+      botonBloqueado: false,
+      descripcion: 'RePoker',
+      imagen: A,
+      puntos: 0,
+      key: 'RP',
+      valor: 50,
+    },
     ]
   );
+   // número de combinaciones
+   const numTotComb = tablaPuntos.length;
+   const [numComb, setNumComb] = useState(0);
+   ///////////////////////////////////////////////////////////////////////////////////
   /* lanzamos los dados, para aquellos dados no bloqueados*/
   function cargarDados(e) {
     numLanzamientos--;
@@ -144,7 +195,6 @@ export default function Tablero() {
       setButtonDisabled(true);
     }
     setDados(nextDados);
-    console.log(dados);
   }
   /* funcion que cambia de estado Bloqueado/desbloqueado un dado*/
   function handleClick(i) {
@@ -178,8 +228,19 @@ export default function Tablero() {
 
 
     setDados(dadosIniciales);
+    /* aumentamos en 1 el número de combinaciones resueltas*/
+    setNumComb(numComb+1);
+    console.log(numComb);
+    if (numComb===numTotComb) {// fin de partida
+      //limpiar todo
+      alert('fin de la partida');
+      
+      //window.location.reload(true);
+    
+    }
     numLanzamientos = 3;
     setButtonDisabled(false);
+    
   }
 
   function calcularPuntos(e) {
@@ -191,15 +252,25 @@ export default function Tablero() {
       case 'J':
       case 'R':
       case 'N':
-        console.log(tablaPuntos[e].key);
         const contador = dados.filter((elemento) => elemento.dado === tablaPuntos[e].key).length;
         puntos = tablaPuntos[e].valor * contador;
         break;
       case 'FULL':
-        if(checkFull(dados))   
+        if(checkDices(dados,'F'))   
         puntos = 30;
         else puntos=0;
         break;
+      case 'P':
+          if(checkDices(dados,'P'))   
+          puntos = 45;
+          else puntos=0;
+          break;
+      case 'RP':
+        if(checkDices(dados,'RP'))   
+        puntos = 45;
+        else puntos=0;
+        break;
+    
       default:
         console.log("defecto");
         puntos = 0;
@@ -210,7 +281,9 @@ export default function Tablero() {
 
   return (
     <div className="container">
-      <h1>Tiradas restantes : {numLanzamientos}</h1>
+      <div className="button-container">
+      <h3>Tiradas restantes : {numLanzamientos}</h3>
+      {numComb===numTotComb && <button>Mostrar Botón</button>}
       {dados.map((item, i) => (
         <Dado
           key={i}
@@ -218,16 +291,17 @@ export default function Tablero() {
           onDadoClick={() => handleClick(i)}
         />
       ))}
-      <div className="button-container">
-        <button className="lanzar" onClick={cargarDados} disabled={buttonDisabled}>Lanzar Dados</button></div>
+      </div>
+        <button className="lanzar" onClick={cargarDados} disabled={buttonDisabled}>Lanzar Dados</button>
       <div className="tabla">
         <h1>Puntos : {total}</h1>
 
         <Tabla value={tablaPuntos} onButtonPuntosClick={(e) => actualizarPuntos(e)} />
-      </div></div>
+      </div>
+    </div>
   );
 }
-
+/*
 const checkFull = (diceArray) => {
   // Paso 1: Obtener un array con solo los valores de los dados (propiedad "dado")
   const diceValues = diceArray.map((a) => a.dado);
@@ -241,4 +315,42 @@ const checkFull = (diceArray) => {
   // Paso 3: Comprobar si hay un Full (3 dados iguales y 2 dados iguales)
   const values = Object.values(occurrences);
   return values.includes(3) && values.includes(2);
+};
+const checkPoker = (diceArray) => {
+  // Paso 1: Obtener un array con solo los valores de los dados (propiedad "dado")
+  const diceValues = diceArray.map((a) => a.dado);
+
+  // Paso 2: Contar las ocurrencias de cada dado en el array
+  const occurrences = {};
+  diceValues.forEach((dice) => {
+    occurrences[dice] = (occurrences[dice] || 0) + 1;
+  });
+
+  // Paso 3: Comprobar si hay un Poker (4 dados iguales y 1 dados iguales)
+  const values = Object.values(occurrences);
+  return values.includes(4) && values.includes(1);
+};*/
+const checkDices = (diceArray,type) => {
+  // Paso 1: Obtener un array con solo los valores de los dados (propiedad "dado")
+  const diceValues = diceArray.map((a) => a.dado);
+
+  // Paso 2: Contar las ocurrencias de cada dado en el array
+  const occurrences = {};
+  diceValues.forEach((dice) => {
+    occurrences[dice] = (occurrences[dice] || 0) + 1;
+  });
+
+  // Paso 3: Comprobar si hay un Poker (4 dados iguales y 1 dados iguales)
+  const values = Object.values(occurrences);
+  switch (type) {
+    case 'F':
+      return values.includes(3) && values.includes(2);
+    case 'P':
+      return values.includes(4) && values.includes(1);
+    case 'RP':
+      return values.includes(5);
+    default:
+      return null;
+  }
+  
 };

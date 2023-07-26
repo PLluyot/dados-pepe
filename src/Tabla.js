@@ -11,9 +11,8 @@ const Tabla = ({ value, onButtonPuntosClick }) => {
                 <thead>
                 <tr>
                     <th>Select</th>
-                    <th>Name</th>
-                    <th>Combination</th>
                     <th>Value</th>
+                    <th>Combination</th>
                     <th>Points</th>
                 </tr>
                 </thead>
@@ -22,13 +21,12 @@ const Tabla = ({ value, onButtonPuntosClick }) => {
                    
                     <tr key={elemento.key}>
                      <td><button disabled={elemento.botonBloqueado} onClick={()=>onButtonPuntosClick(e)}>Seleccionar</button></td>
-                    <td>{elemento.descripcion}</td>
+                    <td className='left'><button className="dado" style={{backgroundImage: `url(${elemento.imagen})`, backgroundSize: 'cover',}}/>{elemento.descripcion} x{elemento.valor}</td>
                     <td>{elemento.dados.map((item, i) => (
                         <Dado
                             key={i+elemento.key}
                             value={item}
                         />))}</td>
-                    <td>{elemento.valor}</td>
                     <td>{elemento.puntos}</td>
                     </tr>
                 ))}
